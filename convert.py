@@ -1,7 +1,8 @@
 import typer
 
 def convert(full_file_path = typer.Argument(..., help = "The path to the Swissquote CSV exported from Swissquote portfolio"), sep = typer.Argument(...,help="The separator to be used in output csv.")):
-    # 
+    # run by command
+    # python3 convert.py "/Users/teskesin/SynologyDrive/Code/git_clones/swissquote-to-parqet-csv-converter/transactions-from-08022019-to-05042023.csv" ";"
     import pandas as pd
     import os
     
@@ -89,9 +90,9 @@ def convert(full_file_path = typer.Argument(..., help = "The path to the Swissqu
     # exp.loc[((exp.type == 'TransferIn')|(exp.type == 'TransferOut')) & (exp.originalcurrency == 'USD'),'holding'] = 'hld_62fe9c0476362ac5e8b88ed8' # USD
     # exp.loc[((exp.type == 'TransferIn')|(exp.type == 'TransferOut')) & (exp.originalcurrency == 'EUR'),'holding'] = 'hld_62fe9c1398683c34ff685ac2' # EUR
 
-    exp.loc[ (exp.originalcurrency == 'CHF'),'holding'] = 'hld_63e7ac5e5b7760f5b9482775'
-    exp.loc[ (exp.originalcurrency == 'USD'),'holding'] = 'hld_63e7ac9d5ef1fc171a40af20' # USD
-    exp.loc[ (exp.originalcurrency == 'EUR'),'holding'] = 'hld_63e7ac9af527114e0a5f9b59' # EUR
+    exp.loc[ (exp.originalcurrency == 'CHF'),'holding'] = 'hld_6430515e76a945185e9a096b'
+    exp.loc[ (exp.originalcurrency == 'USD'),'holding'] = 'hld_64305193646385c63825ecc0' # USD
+    exp.loc[ (exp.originalcurrency == 'EUR'),'holding'] = 'hld_643051de76a945185e9a096f' # EUR
 
 
     exp['datetime'] = pd.to_datetime(exp['datetime'], format='%d-%m-%Y %H:%M:%S')
@@ -108,15 +109,18 @@ def convert(full_file_path = typer.Argument(..., help = "The path to the Swissqu
     cash['fee'] = 0
     cash['tax'] = 0
     
-    #cash['price'] = cash.amount.str.replace("-","") # if amount is string
-    cash['price'] = abs(cash.amount) # if amount is string
-    #cash['date'] = pd.to_datetime(cash['datetime']).dt.date
+    cash['price'] = cash.amount.str.replace("-","") # if amount is string
+    #cash['price'] = abs(cash.amount) # if amount is string
+    cash['date'] = pd.to_datetime(cash['datetime']).dt.date
     cash['time'] = ""
     cash['shares'] = 1
-    cash = cash[['datetime','time','price','shares','currency','tax','fee','type','holding']]
+    cash = cash[['datetime','price','shares','currency','tax','fee','type','holding']]
     
-    cash.to_csv('./cash.csv',sep=';', index = False)
-
+    file_out = './cash.csv'
+    cash.to_csv(file_out,sep=';', index = False)
+    #file_data = open(file_out, 'rb').read()
+    #open(file_out, 'wb').write(file_data[:-2])
+    
     exp.to_csv('./portfolio.csv',sep=';')
     
 
